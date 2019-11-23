@@ -17,12 +17,13 @@ body_re = re.compile(".*<body>(.*)</body>")
 tag_re = re.compile("<.*?>")
 
 def only_words(txt):
-    txt = txt.replace("\n", " ")
-    body = body_re.match(txt).group(1)
-    notag = re.sub(tag_re, " ", body)
-    nosp = re.sub(" +", " ", notag).strip()
+    txt = txt.lower().replace("\n", " ")
+    txt = body_re.match(txt).group(1)
+    txt = re.sub(tag_re, " ", txt)
+    txt = re.sub("[\",.!\-<>]", " ", txt)
+    txt = re.sub(" +", " ", txt).strip()
 
-    return nosp
+    return txt
 
 
 def prepare(path, out):
@@ -31,7 +32,7 @@ def prepare(path, out):
         for f in files:
             name = f.split("/")[-1]
             body = only_words(open(f).read())
-            o.write(json.dumps({"fname": name, "body": body}))
+            o.write(json.dumps({"fname": name, "body": body}) + "\n")
 
 
 methods = {
